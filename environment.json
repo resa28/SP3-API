@@ -1,0 +1,1238 @@
+{
+	"info": {
+		"_postman_id": "0178cad4-2e93-46ad-9e32-b80dff213484",
+		"name": "SekolahQA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "AccessToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"//--tambah properti ke environment variable (accessToken dan tokenType)\r",
+									"postman.setEnvironmentVariable(\"accessToken\", jsonData.access_token);\r",
+									"postman.setEnvironmentVariable(\"tokenType\", jsonData.token_type)\r",
+									"\r",
+									"var variable=pm.response.json();\r",
+									"//--verifikasi properti dari body response\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('access_token')\r",
+									"pm.expect(variable).to.have.property('expires_in')\r",
+									"pm.expect(variable).to.have.property('token_type')\r",
+									"pm.expect(variable).to.have.property('scope')\r",
+									"\r",
+									"//--verifikasi isi dari properti body response\r",
+									"tests[\"value token type is bearer\"]= jsonData.token_type == (\"Bearer\");\r",
+									"console.log(jsonData.token_type);\r",
+									"tests[\"value expires_in is 3600\"]= jsonData.expires_in == (\"3600\");\r",
+									"tests[\"value scope is admin\"]= jsonData.scope == (\"admin\");\r",
+									"\r",
+									"//--verifikasi status response\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"client_id\":\"test-000\",\r\n    \"client_secret\":\"test-000\",\r\n    \"grant_type\":\"client_credentials\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/oauth/issueToken",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"oauth",
+								"issueToken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAuthUser",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.data[0]).to.have.property('userName')\r",
+									"pm.expect(variable.data[0]).to.have.property('userRole')\r",
+									"pm.expect(variable.data[0]).to.have.property('status')\r",
+									"pm.expect(variable.data[0]).to.have.property('employeeName')\r",
+									"pm.expect(variable.data[0]).to.have.property('employeeId')\r",
+									"\r",
+									"tests[\"value userName is Admin\"]= jsonData.data[0].userName == (\"Admin\");\r",
+									"tests[\"value userRole is Admin\"]= jsonData.data[0].userRole == (\"Admin\");\r",
+									"tests[\"value status is Enabled\"]= jsonData.data[0].status == (\"Enabled\");\r",
+									"tests[\"value employeeName is admin admin\"]= jsonData.data[0].employeeName == (\"admin admin\");\r",
+									"tests[\"value employeeId is 1\"]= jsonData.data[0].employeeId == (\"1\");\r",
+									"\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "postAuthLogin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('login')\r",
+									"pm.expect(variable.user).to.have.property('userName')\r",
+									"pm.expect(variable.user).to.have.property('userRole')\r",
+									"pm.expect(variable.user).to.have.property('status')\r",
+									"pm.expect(variable.user).to.have.property('employeeName')\r",
+									"pm.expect(variable.user).to.have.property('employeeId')\r",
+									"\r",
+									"tests[\"value login is true\"]= jsonData.login == true;\r",
+									"tests[\"value userName is Admin\"]= jsonData.user.userName == (\"Admin\");\r",
+									"tests[\"value userRole is Admin\"]= jsonData.user.userRole == (\"Admin\");\r",
+									"tests[\"value status is Enabled\"]= jsonData.user.status == (\"Enabled\");\r",
+									"tests[\"value employeeName is admin admin\"]= jsonData.user.employeeName == (\"admin admin\");\r",
+									"tests[\"value employeeId is 1\"]= jsonData.user.employeeId == (\"1\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"Admin\",\r\n    \"password\": \"s3Kol4HQA!*\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getOrganization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.data).to.have.property('id')\r",
+									"pm.expect(variable.data).to.have.property('name')\r",
+									"pm.expect(variable.data).to.have.property('taxId')\r",
+									"pm.expect(variable.data).to.have.property('registraionNumber')\r",
+									"pm.expect(variable.data).to.have.property('phone')\r",
+									"pm.expect(variable.data).to.have.property('fax')\r",
+									"pm.expect(variable.data).to.have.property('email')\r",
+									"pm.expect(variable.data).to.have.property('country')\r",
+									"pm.expect(variable.data).to.have.property('province')\r",
+									"pm.expect(variable.data).to.have.property('city')\r",
+									"pm.expect(variable.data).to.have.property('zipCode')\r",
+									"pm.expect(variable.data).to.have.property('street1')\r",
+									"pm.expect(variable.data).to.have.property('street2')\r",
+									"pm.expect(variable.data).to.have.property('note')\r",
+									"pm.expect(variable.data).to.have.property('numberOfEmployees')\r",
+									"pm.test(\"Status code is 200\", () => {\r",
+									"  pm.expect(pm.response.code).to.eql(200);\r",
+									"});\r",
+									"\r",
+									"tests[\"value id is 1\"]= jsonData.data.id == (\"1\");\r",
+									"tests[\"value name is Cilsy Fiolution\"]= jsonData.data.name == (\"Cilsy Fiolution\");\r",
+									"tests[\"value taxId is null\"]= jsonData.data.taxId == null;\r",
+									"tests[\"value registraionNumber is null\"]= jsonData.data.registraionNumber == null;\r",
+									"tests[\"value phone is null\"]= jsonData.data.phone == null;\r",
+									"tests[\"value fax is null\"]= jsonData.data.fax == null;\r",
+									"tests[\"value email is null\"]= jsonData.data.email == null;\r",
+									"tests[\"value country is ID\"]= jsonData.data.country == (\"ID\");\r",
+									"tests[\"value province is null\"]= jsonData.data.province == null;\r",
+									"tests[\"value city is null\"]= jsonData.data.city == null;\r",
+									"tests[\"value zipCode is null\"]= jsonData.data.zipCode == null;\r",
+									"tests[\"value street1 is null\"]= jsonData.data.street1 == null;\r",
+									"tests[\"value street2 is null\"]= jsonData.data.street2 == null;\r",
+									"tests[\"value note is null\"]= jsonData.data.note == null;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/organization",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"organization"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "attendance",
+			"item": [
+				{
+					"name": "punchIn",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('success')\r",
+									"pm.expect(variable).to.have.property('id')\r",
+									"\r",
+									"tests[\"value success is Successfully Punched In\"]= jsonData.success == (\"Successfully Punched In\");\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"timezone\": \"Asia/Jakarta\",\r\n    \"note\": \"catatan\",\r\n    \"datetime\": \"2005-12-30 01:02\"\r\n}"
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/punch-in",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"punch-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "punchOut",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('success')\r",
+									"pm.expect(variable).to.have.property('id')\r",
+									"\r",
+									"tests[\"value success is Successfully Punched Out\"]= jsonData.success == (\"Successfully Punched Out\");\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"timezone\": \"Asia/Jakarta\",\r\n    \"note\": \"catatan\",\r\n    \"datetime\": \"2005-12-30 01:02\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/punch-out",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"punch-out"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employee",
+			"item": [
+				{
+					"name": "saveEmployee",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"// pm.environment.get(\"idEmployeePost\");\r",
+									"pm.environment.set(\"codeEmployeeEmp\", jsonData.code );\r",
+									"pm.environment.get(\"codeEmployeeEmp\");\r",
+									"var variable=pm.response.json();\r",
+									"\r",
+									"//--tambah properti code ke environment variable codeEmployeePost\r",
+									"// postman.setEnvironmentVariable(\"idEmployeePost\", jsonData.id);\r",
+									"// postman.setEnvironmentVariable(\"codeEmployeeEmp\", jsonData.code);\r",
+									"\r",
+									"//--verifikasi properti success dan id \r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('success')\r",
+									"pm.expect(variable).to.have.property('id')\r",
+									"\r",
+									"//--verifikasi isi dari properti success\r",
+									"tests[\"value success is Successfully Saved\"]= jsonData.success == (\"Successfully Saved\");\r",
+									"\r",
+									"// tests[\"id is match \" +pm.environment.set(\"idEmployeePost\")]= jsonData.id == pm.environment.set(\"idEmployeePost\"); \r",
+									"tests[\"code is found \" +pm.environment.set(\"codeEmployeeEmp\")]= jsonData.code == pm.environment.set(\"codeEmployeeEmp\"); \r",
+									"tests[\"code is found \" +pm.environment.get(\"codeEmployeeEmp\")]= jsonData.code == pm.environment.get(\"codeEmployeeEmp\"); \r",
+									"\r",
+									"//--verify code is 200 ok\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"{{firstNameEmp}}\",\r\n    \"middleName\": \"{{middleNameEmp}}\",\r\n    \"lastName\": \"{{lastNameEmp}}\",\r\n    \"code\": \"{{codeEmployeeEmp}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.data).to.have.property('firstName') \r",
+									"pm.expect(variable.data).to.have.property('middleName') \r",
+									"pm.expect(variable.data).to.have.property('lastName') \r",
+									"pm.expect(variable.data).to.have.property('code') \r",
+									"pm.expect(variable.data).to.have.property('employeeId') \r",
+									"pm.expect(variable.data).to.have.property('fullName')\r",
+									"pm.expect(variable.data).to.have.property('status')\r",
+									"pm.expect(variable.data).to.have.property('dob')\r",
+									"pm.expect(variable.data).to.have.property('driversLicenseNumber')\r",
+									"pm.expect(variable.data).to.have.property('licenseExpiryDate')\r",
+									"pm.expect(variable.data).to.have.property('maritalStatus')\r",
+									"pm.expect(variable.data).to.have.property('gender')\r",
+									"pm.expect(variable.data).to.have.property('otherId')\r",
+									"pm.expect(variable.data).to.have.property('nationality')\r",
+									"pm.expect(variable.data).to.have.property('unit')\r",
+									"pm.expect(variable.data).to.have.property('jobTitle')\r",
+									"pm.expect(variable.data).to.have.property('supervisor')\r",
+									"tests[\"value firstName is resa\"]= jsonData.data.firstName == (\"resa\");\r",
+									"tests[\"value middleName is nirmaya\"]= jsonData.data.middleName == (\"nirmaya\");\r",
+									"tests[\"value lastName is sari\"]= jsonData.data.lastName == (\"sari\");\r",
+									"tests[\"value code is xs02\"]= jsonData.data.code == (\"xs02\");\r",
+									"tests[\"value employeeId is 41\"]= jsonData.data.employeeId == 41;\r",
+									"tests[\"value fullName is resa nirmaya sari\"]= jsonData.data.fullName == (\"resa nirmaya sari\");\r",
+									"tests[\"code is match \" +pm.variables.get(\"codeEmployee\")]= jsonData.data.code == pm.variables.get(\"codeEmployee\"); \r",
+									"tests[\"employeeId is match \" +pm.variables.get(\"idEmployee\")]= jsonData.data.employeeId == pm.variables.get(\"idEmployee\"); \r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/{{idEmployee}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"{{idEmployee}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('success')\r",
+									"\r",
+									"tests[\"value success is Successfully Saved\"]= jsonData.success == (\"Successfully Updated\");\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"firstName\": \"Resa\",\r\n    \"middleName\": \"Nirmaya\",\r\n    \"lastName\": \"Sari\",\r\n    \"code\": \"005\",\r\n    \"dob\": null,\r\n    \"licenseNumber\": null,\r\n    \"licenseNumberExpDate\": null,\r\n    \"maritalStatus\": null,\r\n    \"gender\": null,\r\n    \"otherId\": \"\",\r\n    \"nationality\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EmployeeSearch",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/search",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Contact Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.data).to.have.property('id')\r",
+									"pm.expect(variable.data).to.have.property('code')\r",
+									"pm.expect(variable.data).to.have.property('fullName')\r",
+									"pm.expect(variable.data).to.have.property('addressStreet1')\r",
+									"pm.expect(variable.data).to.have.property('addressStreet2')\r",
+									"pm.expect(variable.data).to.have.property('city')\r",
+									"pm.expect(variable.data).to.have.property('state')\r",
+									"pm.expect(variable.data).to.have.property('zip')\r",
+									"pm.expect(variable.data).to.have.property('county')\r",
+									"pm.expect(variable.data).to.have.property('homeTelephone')\r",
+									"pm.expect(variable.data).to.have.property('workTelephone')\r",
+									"pm.expect(variable.data).to.have.property('mobile')\r",
+									"pm.expect(variable.data).to.have.property('workEmail')\r",
+									"pm.expect(variable.data).to.have.property('otherEmail')\r",
+									"\r",
+									"tests[\"value id is 2\"]= jsonData.data.id == 2;\r",
+									"tests[\"value code is 005\"]= jsonData.data.code == 005;\r",
+									"tests[\"value fullName is Resa Nirmaya Sari\"]= jsonData.data.fullName == (\"Resa Nirmaya Sari\");\r",
+									"tests[\"value zip is null\"]= jsonData.data.zip == null;\r",
+									"tests[\"value homeTelephone is null\"]= jsonData.data.homeTelephone == null;\r",
+									"tests[\"value workTelephone is null\"]= jsonData.data.workTelephone == null;\r",
+									"tests[\"value mobile is null\"]= jsonData.data.mobile == null;\r",
+									"tests[\"value workEmail is null\"]= jsonData.data.workEmail == null;\r",
+									"tests[\"value otherEmail is null\"]= jsonData.data.otherEmail == null;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/contact-detail",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"contact-detail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Employee Dependents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.data[0]).to.have.property('name')\r",
+									"pm.expect(variable.data[0]).to.have.property('relationship')\r",
+									"pm.expect(variable.data[0]).to.have.property('dob')\r",
+									"pm.expect(variable.data[0]).to.have.property('sequenceNumber')\r",
+									"\r",
+									"tests[\"value name is Resa\"]= jsonData.data[0].name == (\"Resa\");\r",
+									"tests[\"value relationship is relationship\"]= jsonData.data[0].relationship == (\"relationship\");\r",
+									"tests[\"value dob is 2021-11-07\"]= jsonData.data[0].dob == (\"2021-11-07\");\r",
+									"tests[\"value sequenceNumber is 1\"]= jsonData.data[0].sequenceNumber == 1;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/{{id}}/dependent",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"{{id}}",
+								"dependent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee Dependents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.error).to.have.property('status')\r",
+									"pm.expect(variable.error).to.have.property('text')\r",
+									"\r",
+									"tests[\"value status is 202\"]= jsonData.error.status == 202;\r",
+									"tests[\"value text is Sequence Number Is Wrong\"]= jsonData.error.text == (\"Sequence Number Is Wrong\");\r",
+									"\r",
+									"    pm.test(\"Status code is 202\", function () {\r",
+									"        pm.response.to.have.status(202);\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/dependent",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"dependent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Employee Dependents",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Resa\",\r\n    \"relationship\": \"relationship\",\r\n    \"dob\": \"2021-11-07\",\r\n    \"sequenceNumber\": \"001\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/dependent",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"dependent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save Employee Dependent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('success')\r",
+									"pm.expect(variable).to.have.property('sequenceNumber')\r",
+									"\r",
+									"tests[\"value success is Successfully Saved\"]= jsonData.success == (\"Successfully Saved\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Resa\",\r\n    \"relationship\": \"relationship\" ,\r\n    \"dob\": \"2021-11-07\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/dependent",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"dependent"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Supervisor Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.data[1]).to.have.property('name')\r",
+									"pm.expect(variable.data[1]).to.have.property('id')\r",
+									"pm.expect(variable.data[1]).to.have.property('code')\r",
+									"pm.expect(variable.data[1]).to.have.property('reportingMethod')\r",
+									"\r",
+									"tests[\"value name is Resa\"]= jsonData.data[1].name == (\"Resa Nirmaya Sari\");\r",
+									"tests[\"value reportingMethod is reportingMethod\"]= jsonData.data[1].reportingMethod == (\"reportingMethod\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/supervisor",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"supervisor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save Supervisor Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"\r",
+									"postman.setEnvironmentVariable(\"supervisorIdEmp\", jsonData.supervisorId);\r",
+									"\r",
+									"//--verifikasi properti success dan id \r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('success')\r",
+									"\r",
+									"//--verifikasi isi dari properti success\r",
+									"tests[\"value success is Successfully Saved\"]= jsonData.success == (\"Successfully Saved\");\r",
+									"\r",
+									"tests[\"supervisorId is match \" +pm.variables.get(\"supervisorIdEmp\")]= jsonData.supervisorId == pm.variables.get(\"supervisorIdEmp\");\r",
+									"});\r",
+									"\r",
+									"//--verify code is 200 ok\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"supervisorId\": {{supervisorIdEmp}},\r\n    \"reportingMethod\": \"reportingMethod\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/supervisor",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"supervisor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Supervisor Details",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/supervisor",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"supervisor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Supervisor Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable).to.have.property('success')\r",
+									"\r",
+									"//--verifikasi isi dari properti success\r",
+									"tests[\"value success is Successfully Updated\"]= jsonData.success == (\"Successfully Updated\");\r",
+									"});\r",
+									"\r",
+									"//--verify code is 200 ok\r",
+									"    pm.test(\"Status code is 200\", function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"supervisorId\": 1,\r\n    \"reportingMethod\": \"reportingMethod\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/2/supervisor",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"2",
+								"supervisor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Employee Events",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);\r",
+									"var variable=pm.response.json();\r",
+									"pm.test('property Details is Present', function() {\r",
+									"pm.expect(variable.data[1]).to.have.property('employeeId')\r",
+									"pm.expect(variable.data[1]).to.have.property('employeeName')\r",
+									"pm.expect(variable.data[1]).to.have.property('event')\r",
+									"pm.expect(variable.data[1]).to.have.property('type')\r",
+									"pm.expect(variable.data[1]).to.have.property('createdBy')\r",
+									"pm.expect(variable.data[1]).to.have.property('createdDate')\r",
+									"pm.expect(variable.data[1]).to.have.property('note')\r",
+									"\r",
+									"tests[\"value employeeId is 3\"]= jsonData.data[1].employeeId == 3;\r",
+									"tests[\"value employeeName is Resa Nirmaya Sari \"]= jsonData.data[1].employeeName == (\"Resa Nirmaya Sari\");\r",
+									"tests[\"value event is SAVE \"]= jsonData.data[1].event == (\"SAVE\");\r",
+									"tests[\"value type is employee \"]= jsonData.data[1].type == (\"employee\");\r",
+									"tests[\"value createdBy is API \"]= jsonData.data[1].createdBy == (\"API\");\r",
+									"tests[\"value createdDate is 2021-11-06 07:03:11 \"]= jsonData.data[1].createdDate == (\"2021-11-06 07:03:11\");\r",
+									"tests[\"value note is Saving Employee \"]= jsonData.data[1].note == (\"Saving Employee\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{tokenType}} {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/api/v1/employee/event",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"employee",
+								"event"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "tokenType",
+			"value": ""
+		},
+		{
+			"key": "URL",
+			"value": "http://qa.cilsy.id/symfony/web/index.php"
+		},
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "idEmployee",
+			"value": ""
+		},
+		{
+			"key": "firstNameEmp",
+			"value": ""
+		},
+		{
+			"key": "middleNameEmp",
+			"value": ""
+		},
+		{
+			"key": "lastNameEmp",
+			"value": ""
+		},
+		{
+			"key": "codeEmployee",
+			"value": ""
+		},
+		{
+			"key": "supervisorIdEmp",
+			"value": ""
+		},
+		{
+			"key": "idEmployeePost",
+			"value": ""
+		},
+		{
+			"key": "codeEmployeeEmp",
+			"value": ""
+		}
+	]
+}
